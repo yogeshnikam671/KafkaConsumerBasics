@@ -4,14 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Deserializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Map;
 
 public class JSONDeserializer<T> implements Deserializer<T> {
-    private static Logger logger = LoggerFactory.getLogger(JSONDeserializer.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Class<T> className;
 
@@ -44,7 +40,13 @@ public class JSONDeserializer<T> implements Deserializer<T> {
 
     @Override
     public T deserialize(String topic, Headers headers, byte[] data) {
-        return null;
+        if(data == null) return null;
+        try {
+            return objectMapper.readValue(data, className);
+        }
+        catch(Exception e) {
+            throw new SerializationException(e);
+        }
     }
 
     @Override

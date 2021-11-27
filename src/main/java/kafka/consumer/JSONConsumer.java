@@ -2,6 +2,7 @@ package kafka.consumer;
 
 import kafka.consumer.configuration.KafkaConsumerConfig;
 import kafka.consumer.deserializer.JSONDeserializer;
+import kafka.consumer.models.Hobby;
 import kafka.consumer.models.People;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -33,15 +34,27 @@ public class JSONConsumer {
         KafkaConsumer<Integer, People> consumer = new KafkaConsumer<Integer, People>(props);
 
         consumer.subscribe(Arrays.asList(KafkaConsumerConfig.topicsToConsume));
-
         logger.info("Listening to topic --> " + KafkaConsumerConfig.topicsToConsume[0]);
+
 
         while(true) {
             ConsumerRecords<Integer, People> messages = consumer.poll(Duration.ofMillis(100));
 
             for(ConsumerRecord<Integer, People> message : messages) {
                 logger.info("The message received is --> " + message.value());
+                People people = message.value();
+                displayPeopleInfo(people, logger);
             }
+        }
+    }
+
+    public static void displayPeopleInfo(People people, Logger logger) {
+        logger.info("This is amazing, see what I got -->");
+        logger.info("Name: " + people.getName());
+        logger.info("Age: " + people.getAge());
+        logger.info("Hobbies: ");
+        for(Hobby hobby: people.getHobbies()) {
+            logger.info(hobby.getHobbyName() + " Reason: " + hobby.getReason());
         }
     }
 }
